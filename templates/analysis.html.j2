@@ -1,0 +1,126 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="static/styles/main.css">
+
+  <title>Queen Inject Efficiency Visualiser</title>
+  <meta name="description" content="Queen Inject Efficiency Plotter">
+  <meta name="author" content="frugs">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
+  <script src="https://unpkg.com/pako@1.0.5/dist/pako_inflate.min.js"></script>
+</head>
+
+<body>
+
+  <h2 class="heading">
+    Zerg Macro Cycle Visualiser
+  </h2>
+
+  <div class="subheading"><em id="replayName"></em></div>
+
+  <div class="subsubheading hidden">
+    <span id="playerName0"></span>
+  </div>
+
+  <div class="chart-container hidden">
+    <canvas id="myChart0" width="800" height="600"></canvas>
+  </div>
+
+  <br>
+
+  <div class="subsubheading hidden">
+    <span id="playerName1"></span>
+  </div>
+
+  <div class="chart-container hidden">
+    <canvas id="myChart1" width="800" height="600"></canvas>
+  </div>
+
+  <script type="text/javascript">
+
+    colours = [
+      "#39A2AE",
+      "#498467",
+      "#9B8816",
+      "#503D3F",
+      "#C1D37F",
+      "#181F1C",
+      "#EC0B43",
+      "#EDCB96"
+    ]
+
+    rawInputData = JSON.parse('{{analysis_data | safe}}')
+
+    document.getElementById("replayName").innerHTML = rawInputData.replayName
+
+    for (var i = 0, len = rawInputData.players.length; i < Math.min(len, 2); i++) {
+      player = rawInputData.players[i]
+
+      document.getElementById("playerName" + i).parentElement.classList.remove("hidden")
+      document.getElementById("playerName" + i).innerHTML = player.playerName
+
+      chartData = {
+         datasets: player.chartData.map((data, index) => {
+
+           isSupplyBlock = index == player.chartData.length - 1
+           colour = isSupplyBlock ? "rgba(224, 76, 108, 0.4)" : colours[index]
+
+           return {
+             label: isSupplyBlock ? "Supply Blocks" : "Hatchery " + (index + 1),
+             data: data.map((dataPoint) => { return {x: dataPoint[0], y: dataPoint[1] != "NaN" ? dataPoint[1] : NaN } }),
+             steppedLine: 'before',
+             fill: isSupplyBlock ? "origin" : false,
+             backgroundColor: colour,
+             pointRadius: 0,
+             borderColor: colour
+           }
+         })
+      }
+
+      document.getElementById("myChart" + i).parentElement.classList.remove("hidden")
+      var ctx = document.getElementById("myChart" + i).getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'line',
+          data: chartData,
+          options: {
+            title: {
+              display: false,
+            },
+            scales: {
+              xAxes: [{
+                  type: 'time',
+                  position: 'bottom',
+                  time: {
+                    unit: 'minute',
+                    displayFormats: {
+                        minute: 'mm:ss'
+                    }
+                  }
+                }],
+                yAxes: [{
+                    display: false,
+                    ticks: {
+                      suggestedMin: -1,
+                      beginAtZero: false
+                    }
+                }]
+            },
+            tooltip: {
+              enabled: false
+            },
+            layout: {
+              padding: 20
+            },
+            animation: {
+              easing: 'easeOutCubic'
+            }
+          }
+      });
+    }
+
+  </script>
+</body>
+</html>
