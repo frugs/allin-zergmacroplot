@@ -13,6 +13,10 @@ def _frame_to_seconds(frame: int, fps: int) -> int:
     return int(_frame_to_ms(frame, fps) / 1000)
 
 
+def _minutes_to_frames(minutes: float, fps: int) -> int:
+    return int(minutes * 60 * fps * 1.4)
+
+
 def serialise_chart_data(inject_states: List[List[Tuple[int, bool]]],
                          supply_blocks: List[Tuple[float, bool]],
                          fps: int) -> list:
@@ -68,7 +72,8 @@ def analyse_replay_file(replay_name: str,
 
         data["players"].append({
             "chartData": chart_data,
-            "playerName": player.name
+            "playerName": player.name,
+            "widthScaling": replay.frames / _minutes_to_frames(9, replay.game_fps)
         })
 
     return replay.filehash, data

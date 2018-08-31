@@ -47,36 +47,14 @@ form {
     color: rgba(0, 0, 0, 0);
 }
 
-@media (max-width: 1000px) and (orientation: landscape) {
-
-  div.chart-container {
-    position: relative;
-    width: 10vh;
-    width:80vw;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-}
-
-@media (max-width: 1000px) and (orientation: portrait) {
-
-  div.chart-container {
+div.chart-container {
     position: relative;
     width: 800px;
     margin-left: auto;
     margin-right: auto;
-  }
-
 }
 
-@media (min-width: 1000px) {
-
-  div.chart-container {
-    position: relative;
-    width:800px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
+div.chart-container-outer {
+    overflow-x: scroll;
+    margin: 0vw 10vw;
 }
