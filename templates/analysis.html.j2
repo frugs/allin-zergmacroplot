@@ -6,7 +6,7 @@
   <link rel="stylesheet" type="text/css" href="static/styles/main.css">
 
   <title>Zerg Macro Cycle Visualiser</title>
-  <meta name="description" content="Queen Inject Efficiency Plotter">
+  <meta name="description" content="Zerg Macro Cycle Visualiser">
   <meta name="author" content="frugs">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
@@ -25,7 +25,7 @@
     <span id="playerName0"></span>
   </div>
 
-  <div class="chart-container-outer">
+  <div class="chart-container-outer hidden">
     <div id="chartContainer0" class="chart-container hidden">
       <canvas id="myChart0" width="800" height="600"></canvas>
     </div>
@@ -37,7 +37,7 @@
     <span id="playerName1"></span>
   </div>
 
-  <div class="chart-container-outer">
+  <div class="chart-container-outer hidden">
     <div id="chartContainer1" class="chart-container hidden">
       <canvas id="myChart1" width="800" height="600"></canvas>
     </div>
@@ -51,9 +51,9 @@
       "#498467",
       "#9B8816",
       "#503D3F",
-      "#C1D37F",
-      "#EC0B43",
-      "#EDCB96"
+      "#2F4B26",
+      "#A4243B",
+      "#84828F"
     ]
 
     rawInputData = JSON.parse('{{analysis_data | safe}}')
@@ -66,6 +66,8 @@
       document.getElementById("playerName" + i).parentElement.classList.remove("hidden")
       document.getElementById("playerName" + i).innerHTML = player.playerName
 
+      document.getElementById("chartContainer" + i).parentElement.classList.remove("hidden")
+      document.getElementById("chartContainer" + i).classList.remove("hidden")
       document.getElementById("chartContainer" + i).style.width = "" + (800 * player.widthScaling) + "px"
 
       chartData = {
