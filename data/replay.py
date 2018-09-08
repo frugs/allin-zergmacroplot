@@ -1,13 +1,13 @@
 from typing import IO, Tuple, List
 
-# noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferences,PyPackageRequirements
 import sc2reader
 import techlabreactor
 
 MAX_CREEP_TUMOURS_DISPLAYED = 3
 MAX_STEP_SIZE = 9
 SEQUENCE_SIZE = 10
-CHART_BASE_WIDTH_IN_MINUTES = 9
+CHART_BASE_WIDTH_IN_MINUTES = 6.5
 
 
 def _frame_to_ms(frame: int, fps: int) -> int:
@@ -23,18 +23,39 @@ def _minutes_to_frames(minutes: float, fps: int) -> int:
 
 
 def serialise_chart_data(inject_states: List[List[Tuple[int, bool]]],
+                         larvae_blocks: List[List[Tuple[int, bool]]],
                          supply_blocks: List[Tuple[float, bool]],
-                         creep_states_changes: List[Tuple[int, int]],
-                         fps: int,
+                         creep_states_changes: List[Tuple[int, int]], fps: int,
                          total_frames: int) -> list:
     chart_data = []
 
     offset = 0
-    for state_series in inject_states:
+    for injects, larvae in zip(inject_states, larvae_blocks):
         chart_data.append([[
             _frame_to_ms(frame, fps), offset + (MAX_STEP_SIZE
                                                 if injected else 0)
-        ] for frame, injected in state_series])
+        ] for frame, injected in injects])
+
+        larvae_block_dataset = []
+        baseline_dataset = []
+        for frame, blocked in larvae:
+            if blocked:
+                larvae_block_dataset.append([_frame_to_ms(frame, fps), offset])
+                larvae_block_dataset.append(
+                    [_frame_to_ms(frame, fps), offset + MAX_STEP_SIZE])
+
+                baseline_dataset.append([_frame_to_ms(frame, fps), offset])
+                baseline_dataset.append([_frame_to_ms(frame, fps), offset])
+            else:
+                larvae_block_dataset.append([_frame_to_ms(frame, fps), offset])
+                larvae_block_dataset.append([_frame_to_ms(frame, fps), "NaN"])
+
+                baseline_dataset.append([_frame_to_ms(frame, fps), offset])
+                baseline_dataset.append([_frame_to_ms(frame, fps), "NaN"])
+
+        chart_data.append(larvae_block_dataset)
+        chart_data.append(baseline_dataset)
+
         offset += SEQUENCE_SIZE
 
     creep_data = [[0, offset]]
@@ -87,16 +108,18 @@ def analyse_replay_file(replay_name: str,
         if not inject_states:
             continue
 
+        larvae_blocks = techlabreactor.larvae_blocks_per_hatchery_for_player(
+            player, replay)
+
         supply_blocks = techlabreactor.get_supply_blocks_till_time_for_player(
             _frame_to_seconds(replay.frames, replay.game_fps), player, replay)
 
         creep_states_changes = techlabreactor.creep_tumour_state_changes(
             player, replay)
 
-        chart_data = serialise_chart_data(inject_states, supply_blocks,
-                                          creep_states_changes,
-                                          replay.game_fps,
-                                          replay.frames)
+        chart_data = serialise_chart_data(inject_states, larvae_blocks,
+                                          supply_blocks, creep_states_changes,
+                                          replay.game_fps, replay.frames)
 
         data["players"].append({
             "chartData":

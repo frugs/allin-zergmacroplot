@@ -71,80 +71,99 @@
       document.getElementById("chartContainer" + i).style.width = "" + (800 * player.widthScaling) + "px"
 
       chartData = {
-         datasets: player.chartData.map((data, index) => {
+        datasets: player.chartData.map((data, index) => {
 
-           switch (player.chartData.length - index) {
-             case 1:
-               label = "Supply Block";
-               fill = true;
-               colour = "rgba(224, 76, 108, 0.4)";
-               break;
-             case 2:
-               label = "Creep Production";
-               fill = false;
-               colour = "#181F1C";
-               break;
-             default:
-               label = "Hatchery " + (index + 1);
-               fill = false;
-               colour = colours[index];
-               break;
-           }
+          switch (player.chartData.length - index) {
+            case 1:
+              label = "Supply Block";
+              fill = true;
+              colour = "rgba(224, 76, 108, 0.4)";
+              break;
+            case 2:
+              label = "Creep Production";
+              fill = false;
+              colour = "#181F1C";
+              break;
+            default:
+              hatcheryIndex = Math.floor(index / 3);
+              if (index % 3 == 0) {
+                // injects
+                label = "Hatchery " + (hatcheryIndex + 1) + " Injects";
+                fill = false;
+                colour = colours[hatcheryIndex];
+              } else if (index % 3 == 1) {
+                // larva blocks
+                label = "Hatchery " + (hatcheryIndex + 1) + " Larvae Blocks";
+                fill = "+1";
+                colour = "rgba(192, 192, 192, 0.6)";
+              } else {
+                // hidden dataset
+                label = "";
+                fill = false;
+                colour = "rgba(0, 0, 0, 0)";
+              }
+              break;
+          }
 
-           return {
-             label: label,
-             data: data.map((dataPoint) => { return {x: dataPoint[0], y: dataPoint[1] != "NaN" ? dataPoint[1] : NaN } }),
-             steppedLine: 'before',
-             fill: fill,
-             backgroundColor: colour,
-             pointRadius: 0,
-             borderColor: colour
-           }
-         })
+          return {
+            label: label,
+            data: data.map((dataPoint) => { return {x: dataPoint[0], y: dataPoint[1] != "NaN" ? dataPoint[1] : NaN } }),
+            steppedLine: 'before',
+            fill: fill,
+            backgroundColor: colour,
+            pointRadius: 0,
+            borderColor: colour
+          }
+        })
       }
 
       document.getElementById("myChart" + i).parentElement.classList.remove("hidden")
       var ctx = document.getElementById("myChart" + i).getContext('2d');
       var myChart = new Chart(ctx, {
-          type: 'line',
-          data: chartData,
-          options: {
-            title: {
-              display: false,
-            },
-            scales: {
-              xAxes: [{
-                  type: 'time',
-                  position: 'bottom',
-                  time: {
-                    unit: 'minute',
-                    displayFormats: {
-                        minute: 'mm:ss'
-                    }
+        type: 'line',
+        data: chartData,
+        options: {
+          title: {
+            display: false,
+          },
+          scales: {
+            xAxes: [
+              {
+                type: 'time',
+                position: 'bottom',
+                time: {
+                  unit: 'minute',
+                  unitStepSize: 1,
+                  displayFormats: {
+                    minute: 'mm:ss'
                   }
-                }],
-                yAxes: [{
-                    display: false,
-                    ticks: {
-                      suggestedMin: -1,
-                      beginAtZero: false
-                    }
-                }]
-            },
-            tooltip: {
-              enabled: false
-            },
-            layout: {
-              padding: 20
-            },
-            animation: {
-              easing: 'easeOutCubic'
-            },
-            maintainAspectRatio: false,
-            legend: {
-              position: player.widthScaling <= 1 ? "top" : "left"
+                }
+              }],
+              yAxes: [{
+                  display: false,
+                  ticks: {
+                    suggestedMin: -1,
+                    beginAtZero: false
+                  }
+              }]
+          },
+          tooltip: {
+            enabled: false
+          },
+          layout: {
+            padding: 20
+          },
+          animation: {
+            easing: 'easeOutCubic'
+          },
+          maintainAspectRatio: false,
+          legend: {
+            position: "left",
+            labels: {
+              filter: (legendItem) => legendItem.datasetIndex > player.chartData.length - 2 || legendItem.datasetIndex % 3 != 2
             }
           }
+        }
       });
     }
 
