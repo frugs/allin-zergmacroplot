@@ -93,7 +93,7 @@
                 colour = colours[hatcheryIndex];
               } else if (index % 3 == 1) {
                 // larva blocks
-                label = "Hatchery " + (hatcheryIndex + 1) + " Larvae Blocks";
+                label = "Hatchery Larvae Blocks";
                 fill = "+1";
                 colour = "rgba(192, 192, 192, 0.6)";
               } else {
@@ -160,7 +160,10 @@
           legend: {
             position: "left",
             labels: {
-              filter: (legendItem) => legendItem.datasetIndex > player.chartData.length - 2 || legendItem.datasetIndex % 3 != 2
+              filter: (legendItem) =>
+                legendItem.datasetIndex > player.chartData.length - 2
+                  || legendItem.datasetIndex == player.chartData.length - 4
+                  || legendItem.datasetIndex % 3 == 0
             }
           }
         }
