@@ -72,20 +72,35 @@
 
       chartData = {
         datasets: player.chartData.map((data, index) => {
-
           switch (player.chartData.length - index) {
             case 1:
               label = "Supply Block";
               fill = true;
               colour = "rgba(224, 76, 108, 0.4)";
+              steppedLine = 'before';
               break;
             case 2:
+              label = "Unspent Vespene Gas";
+              fill = false;
+              colour = "rgba(50, 192, 50, 0.2)";
+              steppedLine = false;
+              break;
+            case 3:
+              label = "Unspent Minerals";
+              fill = false;
+              colour = "rgba(50, 150, 255, 0.2)";
+              steppedLine = false;
+              break;
+            case 4:
               label = "Creep Production";
               fill = false;
               colour = "#181F1C";
+              steppedLine = 'before';
               break;
             default:
+              steppedLine = 'before';
               hatcheryIndex = Math.floor(index / 3);
+
               if (index % 3 == 0) {
                 // injects
                 label = "Hatchery " + (hatcheryIndex + 1) + " Injects";
@@ -108,7 +123,7 @@
           return {
             label: label,
             data: data.map((dataPoint) => { return {x: dataPoint[0], y: dataPoint[1] != "NaN" ? dataPoint[1] : NaN } }),
-            steppedLine: 'before',
+            steppedLine: steppedLine,
             fill: fill,
             backgroundColor: colour,
             pointRadius: 0,
@@ -138,14 +153,22 @@
                     minute: 'mm:ss'
                   }
                 }
-              }],
-              yAxes: [{
-                  display: false,
-                  ticks: {
-                    suggestedMin: -1,
-                    beginAtZero: false
+              }
+            ],
+            yAxes: [
+              {
+                display: true,
+                labelString: "Resource count",
+                ticks: {
+                  suggestedMin: -1,
+                  beginAtZero: true,
+                  stepSize: 10,
+                  callback: function(value, index, values) {
+                      return value >= 0 ? value * 20 : "";
                   }
-              }]
+                }
+              }
+            ]
           },
           tooltip: {
             enabled: false
@@ -161,8 +184,8 @@
             position: "left",
             labels: {
               filter: (legendItem) =>
-                legendItem.datasetIndex > player.chartData.length - 2
-                  || legendItem.datasetIndex == player.chartData.length - 4
+                legendItem.datasetIndex > player.chartData.length - 4
+                  || legendItem.datasetIndex == player.chartData.length - 6
                   || legendItem.datasetIndex % 3 == 0
             }
           }

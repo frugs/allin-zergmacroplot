@@ -8,6 +8,9 @@ MAX_CREEP_TUMOURS_DISPLAYED = 3
 MAX_STEP_SIZE = 9
 SEQUENCE_SIZE = 10
 CHART_BASE_WIDTH_IN_MINUTES = 6.5
+MINIMUM_MAX_UNUSED_RES = 1000
+UNUSED_RES_CHART_HEIGHT = SEQUENCE_SIZE * 5
+UNUSED_RES_CHART_HEIGHT_SCALE = UNUSED_RES_CHART_HEIGHT / MINIMUM_MAX_UNUSED_RES
 
 
 def _frame_to_ms(frame: int, fps: int) -> int:
@@ -25,7 +28,9 @@ def _minutes_to_frames(minutes: float, fps: int) -> int:
 def serialise_chart_data(inject_states: List[List[Tuple[int, bool]]],
                          larvae_blocks: List[List[Tuple[int, bool]]],
                          supply_blocks: List[Tuple[float, bool]],
-                         creep_states_changes: List[Tuple[int, int]], fps: int,
+                         creep_states_changes: List[Tuple[int, int]],
+                         unused_minerals: List[Tuple[int, int]],
+                         unused_gas: List[Tuple[int, int]], fps: int,
                          total_frames: int) -> list:
     chart_data = []
 
@@ -75,6 +80,18 @@ def serialise_chart_data(inject_states: List[List[Tuple[int, bool]]],
 
     max_value = offset
 
+    max_unused_res = max(MINIMUM_MAX_UNUSED_RES, max_value / UNUSED_RES_CHART_HEIGHT_SCALE)
+
+    chart_data.append([[
+        _frame_to_ms(frame, fps),
+        min(minerals, max_unused_res) * UNUSED_RES_CHART_HEIGHT_SCALE
+    ] for frame, minerals in unused_minerals])
+
+    chart_data.append([[
+        _frame_to_ms(frame, fps),
+        min(gas, max_unused_res) * UNUSED_RES_CHART_HEIGHT_SCALE
+    ] for frame, gas in unused_gas])
+
     supply_block_data = []
     was_blocked = False
     for second, blocked in supply_blocks:
@@ -93,6 +110,16 @@ def serialise_chart_data(inject_states: List[List[Tuple[int, bool]]],
     chart_data.append(supply_block_data)
 
     return chart_data
+
+
+def unused_resources(
+        player, replay) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]:
+    stats_events = [
+        event for event in replay.tracker_events
+        if event.name == "PlayerStatsEvent" and event.player == player
+    ]
+    return [(event.frame, event.minerals_current) for event in stats_events
+            ], [(event.frame, event.vespene_current) for event in stats_events]
 
 
 def analyse_replay_file(replay_name: str,
@@ -117,9 +144,11 @@ def analyse_replay_file(replay_name: str,
         creep_states_changes = techlabreactor.creep_tumour_state_changes(
             player, replay)
 
-        chart_data = serialise_chart_data(inject_states, larvae_blocks,
-                                          supply_blocks, creep_states_changes,
-                                          replay.game_fps, replay.frames)
+        unused_minerals, unused_gas = unused_resources(player, replay)
+
+        chart_data = serialise_chart_data(
+            inject_states, larvae_blocks, supply_blocks, creep_states_changes,
+            unused_minerals, unused_gas, replay.game_fps, replay.frames)
 
         data["players"].append({
             "chartData":
