@@ -1,10 +1,10 @@
 import setuptools
 
-VERSION = "0.0.11"
+VERSION = "0.0.12"
 
 setuptools.setup(
   name='zergmacroplot',
-  packages=['zergmacroplot'],
+  packages=setuptools.find_packages(),
   version=VERSION,
   description='SC2 Replay Analyser which visualises a player\'s Zerg Macro Mechanics',
   author='Hugo Wainwright',
