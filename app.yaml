@@ -1,5 +1,7 @@
 runtime: python37
 
+service: zergmacro
+
 handlers:
 - url: /zergmacro/static
   static_dir: static

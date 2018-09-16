@@ -1,5 +1,4 @@
 flask
 techlabreactor
-sc2reader
 pyrebase
 google-cloud-datastore
