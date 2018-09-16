@@ -10,9 +10,9 @@ class InMemoryDatabase(Database):
         super().__init__()
         self.storage = {}
 
-    def add_document(self, id: str, doc: dict) -> None:
-        self.storage[id] = doc
+    def add_document(self, doc_id: str, doc: dict) -> None:
+        self.storage[doc_id] = doc
 
-    def get_document_as_str(self, id: str) -> Optional[str]:
-        doc = self.storage.get(id, None)
+    def get_document_as_str(self, doc_id: str) -> Optional[str]:
+        doc = self.storage.get(doc_id, None)
         return json.dumps(doc) if doc else None

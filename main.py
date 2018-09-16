@@ -1,14 +1,27 @@
 import io
+
 import flask
+
 import data
-import storage.inmemorydatabase
+import storage
 
 ROOT_PATH = "/zergmacro/"
 
-
-database = storage.inmemorydatabase.InMemoryDatabase()
-
 app = flask.Flask(__name__, static_url_path=ROOT_PATH + "static")
+
+if __name__ == "__main__":
+    # Assume we're running locally
+    import storage.inmemorydatabase
+    database = storage.inmemorydatabase.InMemoryDatabase()
+else:
+    # Assume we're running in Google App Engine
+    from google.cloud import datastore
+    import storage.firebasedatabase
+
+    datastore_client = datastore.Client()
+    firebase_config = datastore_client.get(datastore_client.key("Config", "firebaseConfig"))
+
+    database = storage.firebasedatabase.FirebaseDatabase(firebase_config["value"])
 
 
 @app.route(ROOT_PATH)
@@ -50,6 +63,7 @@ def show_analysis(replay_id: str):
 
 
 def main():
+    print("http://127.0.0.1:32444" + ROOT_PATH)
     app.run(host='127.0.0.1', port=32444, debug=True)
 
 
