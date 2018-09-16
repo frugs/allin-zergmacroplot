@@ -14,10 +14,10 @@ install:
   - "%PYTHON%\\python.exe setup.py install"
   - cd ..
 
-version: '0.0.8+{build}'
+version: '0.0.9+{build}'
 
 build_script:
-  - "%PYTHON%\\Scripts\\pyinstaller.exe app.py --name allin-zergmacroplot --add-data static;static --add-data templates;templates --add-data LICENSE;."
+  - "%PYTHON%\\Scripts\\pyinstaller.exe main.py --name allin-zergmacroplot --add-data static;static --add-data templates;templates --add-data LICENSE;."
   - ps: Compress-Archive -Path dist\allin-zergmacroplot -DestinationPath "allin-zergmacroplot-${Env:APPVEYOR_BUILD_VERSION}.zip"
 
 artifacts:

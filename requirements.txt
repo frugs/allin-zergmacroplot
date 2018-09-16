@@ -1,4 +1,3 @@
-jinja2
-aiohttp_jinja2
-aiohttp
+flask
 techlabreactor
+sc2reader

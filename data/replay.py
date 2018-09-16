@@ -1,6 +1,5 @@
 from typing import IO, Tuple, List
 
-# noinspection PyUnresolvedReferences,PyPackageRequirements
 import sc2reader
 import techlabreactor
 
