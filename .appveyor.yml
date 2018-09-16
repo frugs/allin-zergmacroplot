@@ -14,7 +14,7 @@ install:
   - "%PYTHON%\\python.exe setup.py install"
   - cd ..
 
-version: '0.0.9+{build}'
+version: '0.0.10+{build}'
 
 build_script:
   - "%PYTHON%\\Scripts\\pyinstaller.exe main.py --name allin-zergmacroplot --add-data static;static --add-data templates;templates --add-data LICENSE;."
