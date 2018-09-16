@@ -1,1 +1,7 @@
 runtime: python37
+
+handlers:
+- url: /zergmacro/static
+  static_dir: static
+- url: /zergmacro/.*
+  script: main.app

@@ -3,17 +3,20 @@ import flask
 import data
 import storage.inmemorydatabase
 
+ROOT_PATH = "/zergmacro/"
+
+
 database = storage.inmemorydatabase.InMemoryDatabase()
 
-app = flask.Flask(__name__)
+app = flask.Flask(__name__, static_url_path=ROOT_PATH + "static")
 
 
-@app.route('/')
+@app.route(ROOT_PATH)
 def index():
     return flask.render_template("index.html.j2")
 
 
-@app.route("/upload", methods=["POST"])
+@app.route(ROOT_PATH + "upload", methods=["POST"])
 def upload():
     if flask.request.files:
         file = next(flask.request.files.values(), None)
@@ -33,10 +36,10 @@ def upload():
 
     database.add_document(replay_id, replay_analysis)
 
-    return flask.redirect(replay_id)
+    return flask.redirect(flask.url_for(show_analysis.__name__, replay_id=replay_id))
 
 
-@app.route("/<replay_id>")
+@app.route(ROOT_PATH + "<replay_id>")
 def show_analysis(replay_id: str):
     analysis_data = database.get_document_as_str(replay_id)
 
