@@ -42,7 +42,7 @@ form {
 
 .hidden {
     display: none;
-    height: 0px;
+    height: 0;
     font-size: 0.1em;
     color: rgba(0, 0, 0, 0);
 }
@@ -56,5 +56,5 @@ div.chart-container {
 
 div.chart-container-outer {
     overflow-x: scroll;
-    margin: 0vw 10vw;
+    margin: 0 10vw;
 }
